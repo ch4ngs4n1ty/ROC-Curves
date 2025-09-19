@@ -73,8 +73,18 @@ for (i in seq_along(thresholds)) {
     
 }
 
+png("roc_curve.png", width=600, height=600)
+
 plot(FPR, TPR, 
 
-    main = "Chart"
-
+    main = "Chart",
+    type = "l",
+    lend = 0,
+    lwd = 2,
+    lty = 2,
+    xaxs = "i",
+    yaxs = "i",
 )
+points(FPR, TPR, pch = 19, col = "blue")
+abline(0, 1, lty=2)
+dev.off()
