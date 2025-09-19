@@ -20,7 +20,7 @@ data_all <- do.call(rbind, dfs) #Combine all data frames into one data frame
 #Compare with is_aggressive to get TP/FP/TN/FN.
 #Compute FPR and TPR.
 
-thresholds <- (45:85) #Define thresholds from 45 to 85
+thresholds <- 45:85 #Define thresholds from 45 to 85
 
 all_speeds <- data_all$SPEED #Extract speed_mph column from the combined data frame
 
@@ -28,7 +28,11 @@ all_speeds <- data_all$SPEED #Extract speed_mph column from the combined data fr
 #Intent Non-Aggresive Level = {0}
 data_all$is_aggresive <- ifelse(data_all$INTENT %in% c(1, 2), 1, 0)
 
+truth <- data_all$is_aggresive
 
+TPR = numeric(length(thresholds)) #True Positive Rate of (Actual(True), Suspected (True))
+FPR = numeric(length(thresholds)) #False Positive Rate of (Actual (True), Suspected (False))
+mistakes = integer(length(thresholds)) 
 
 for (i in seq_along(thresholds)) {
 
@@ -36,6 +40,41 @@ for (i in seq_along(thresholds)) {
 
     predicted <- ifelse(all_speeds >= t, 1, 0) #Logical vector of aggresive = 1, and non-aggresive = 0
 
+    TP = sum(predicted == 1 & truth == 1)
+    FP = sum(predicted == 1 & truth == 0)
+    TN = sum(predicted == 0 & truth == 0)
+    FN = sum(predicted == 0 & truth == 1)
 
+    tpr_val = (TP / (TP + FN))
 
+    fpr_val = (FP / (FP + TN))
+
+    if (tpr_val > 0) {
+
+        TPR[i] = tpr_val
+
+    } else {
+
+        TPR[i] = 0
+
+    }
+
+    if (fpr_val > 0) {
+
+        FPR[i] = fpr_val
+
+    } else {
+
+        FPR[i] = 0
+
+    }
+
+    mistakes[i] = FP + FN
+    
 }
+
+plot(FPR, TPR, 
+
+    main = "Chart"
+
+)
